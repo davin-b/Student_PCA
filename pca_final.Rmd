@@ -1,0 +1,89 @@
+---
+title: "4442 Final"
+author: "Davin B"
+date: "5/27/2022"
+output: word_document
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+# c <- c("FactoMineR", "factoextra", "corrplot", "mice")
+# install.packages(c)
+library("FactoMineR")
+library("factoextra")
+library("corrplot")
+library("mice")
+```
+
+## Data
+
+
+```{r}
+student.mat<-read.csv("student-mat-clean.csv", sep=' ')
+#md.pattern(student.mat)
+#No need for mice. This data set is completely observed.
+# switch yes / no to 0 and 1
+# remove remaining categorical variables
+```
+
+
+```{r}
+#correlation matrix
+m<-cor(student.mat)
+corrplot(m, method = "ellipse")
+example<-lm(student.mat$G3~G1+G2, data=student.mat)
+summary(example)
+```
+Initial pca model and eigenvalues
+```{r}
+pca<-prcomp(student.mat)
+summary(pca)
+eig.val<-get_eigenvalue(pca)
+summary(eig.val)
+```
+Graph showing percentage of variance explained
+```{r}
+new.pca<-PCA(student.mat, graph = F)
+fviz_eig(new.pca, addlabels = TRUE, ylim = c(0, 60), linecolor = "red", barfill = "darkblue", barcolor = "darkblue")
+```
+Cool graphs
+```{r}
+var  <- get_pca_var(new.pca)
+fviz_pca_var(new.pca, col.var = "darkblue")
+fviz_cos2(new.pca, choice ="var", axes = 1:2, top = 10, color = "darkblue" )
+var$contrib
+```
+```{r}
+fviz_contrib(new.pca, choice = "var", axes = 1, top = 5)
+fviz_pca_ind (new.pca, pointsize = "cos2", pointshape = 22, fill = "blue", repel = TRUE, max.overlaps=500)
+plot(new.pca,  select = "cos2 50", cex=1,  col.ind = "darkblue", title = "Factors contributing to school performance", cex.main=2, col.main= "darkblue")
+```
+Second PCA
+```{r}
+student.mat.new<-read.csv("student-mat-clean-two.csv", sep=' ')
+pca.new<-prcomp(student.mat.new)
+eig.val.new<-get_eigenvalue(pca.new)
+
+new.pca.two<-PCA(student.mat.new, graph = F)
+fviz_eig(new.pca.two, addlabels = TRUE, ylim = c(0, 60), linecolor = "red", barfill = "darkblue", barcolor = "darkblue")
+var.new<-get_pca_var(new.pca.two)
+fviz_pca_var(new.pca.two, col.var = "darkblue")
+example.two<-lm(student.mat$G3~Medu+Fedu+failures, data=student.mat)
+summary(example.two)
+```
+
+
+```{r}
+student.mat.new<-read.csv("student-mat-clean-two.csv", sep=' ')
+pca.new<-prcomp(student.mat.new)
+eig.val.new<-get_eigenvalue(pca.new)
+
+new.pca.two<-PCA(student.mat.new, graph = F)
+fviz_eig(new.pca.two, addlabels = TRUE, ylim = c(0, 60), linecolor = "red", barfill = "darkblue", barcolor = "darkblue")
+var.new<-get_pca_var(new.pca.two)
+fviz_pca_var(new.pca.two, col.var = "darkblue")
+example.two<-lm(student.mat$G3~Medu+Fedu+failures, data=student.mat)
+summary(example.two)
+```
+
